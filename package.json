@@ -10,9 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
+    "@react-three/drei": "^10.0.5",
     "@tailwindcss/vite": "^4.0.15",
+    "gsap": "^3.12.7",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-three-fiber": "^6.0.13",
+    "three": "^0.174.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
