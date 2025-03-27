@@ -8,9 +8,9 @@ import { hightlightsSlides } from "../constants";
 import { pauseImg, playImg, replayImg } from "../utils";
 
 const VideoCarousel = () => {
-  const videoRef = useRef<(HTMLVideoElement | null)[]>([]);
-  const videoSpanRef = useRef<(HTMLSpanElement | null)[]>([]);
-  const videoDivRef = useRef<(HTMLDivElement | null)[]>([]);
+  const videoRef = useRef<Array<HTMLVideoElement | null>>([]);  // Corrected useRef type
+  const videoSpanRef = useRef<Array<HTMLSpanElement | null>>([]);  // Corrected useRef type
+  const videoDivRef = useRef<Array<HTMLDivElement | null>>([]);  // Corrected useRef type
 
   const [video, setVideo] = useState({
     isEnd: false,
@@ -20,7 +20,7 @@ const VideoCarousel = () => {
     isPlaying: false,
   });
 
-  const [loadedData, setLoadedData] = useState([]);
+  const [loadedData, setLoadedData] = useState<any[]>([]);  // Added any[] type
   const { isEnd, isLastVideo, startPlay, videoId, isPlaying } = video;
 
   useGSAP(() => {
@@ -90,7 +90,7 @@ const VideoCarousel = () => {
       }
 
       const animUpdate = () => {
-        anim.progress(videoRef.current[videoId]!.currentTime / hightlightsSlides[videoId].videoDuration);
+        anim.progress(videoRef.current[videoId]?.currentTime / hightlightsSlides[videoId].videoDuration);  // Added null check
       };
 
       if (isPlaying) {
@@ -104,9 +104,9 @@ const VideoCarousel = () => {
   useEffect(() => {
     if (loadedData.length > 3) {
       if (!isPlaying) {
-        videoRef.current[videoId]?.pause();
+        videoRef.current[videoId]?.pause();  // Added null check
       } else {
-        startPlay && videoRef.current[videoId]?.play();
+        startPlay && videoRef.current[videoId]?.play();  // Added null check
       }
     }
   }, [startPlay, videoId, isPlaying, loadedData]);
@@ -138,7 +138,9 @@ const VideoCarousel = () => {
     }
   };
 
-  const handleLoadedMetaData = (i: number, e: Event) => setLoadedData((pre) => [...pre, e]);
+  const handleLoadedMetaData = (i: number, e: React.SyntheticEvent<HTMLVideoElement, Event>) => {  // Updated event type
+    setLoadedData((pre) => [...pre, e]);
+  };
 
   return (
     <>
@@ -160,7 +162,7 @@ const VideoCarousel = () => {
                   onPlay={() =>
                     setVideo((pre) => ({ ...pre, isPlaying: true }))
                   }
-                  onLoadedMetadata={(e) => handleLoadedMetaData(i, e)}
+                  onLoadedMetadata={(e) => handleLoadedMetaData(i, e)}  // Updated event type
                 >
                   <source src={list.video} type="video/mp4" />
                 </video>
@@ -180,18 +182,19 @@ const VideoCarousel = () => {
 
       <div className="relative flex items-center justify-center mt-10">
         <div className="flex items-center justify-center py-5 px-7 bg-gray-300 backdrop-blur rounded-full">
-          {videoRef.current.map((_, i) => (
-            <span
-              key={i}
-              className="mx-2 w-3 h-3 bg-gray-200 rounded-full relative cursor-pointer"
-              ref={(el) => (videoDivRef.current[i] = el)}
-            >
+          {videoRef.current.length > 0 &&  // Added null check before mapping
+            videoRef.current.map((_, i) => (
               <span
-                className="absolute h-full w-full rounded-full"
-                ref={(el) => (videoSpanRef.current[i] = el)}
-              />
-            </span>
-          ))}
+                key={i}
+                className="mx-2 w-3 h-3 bg-gray-200 rounded-full relative cursor-pointer"
+                ref={(el) => (videoDivRef.current[i] = el)}
+              >
+                <span
+                  className="absolute h-full w-full rounded-full"
+                  ref={(el) => (videoSpanRef.current[i] = el)}
+                />
+              </span>
+            ))}
         </div>
 
         <button className="ml-4 p-4 rounded-full bg-gray-300 backdrop-blur flex items-center justify-center">
